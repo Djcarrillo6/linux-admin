@@ -8,4 +8,7 @@
 (1) [Introduction](/section-1.md)
 
 ### Section 2 - Setting Up Your Environment
-(2) [Introduction](/section-2.md)
+(2) [Setting Up Your Env](/section-2.md)
+
+### Section 3 - The Linux Terminal
+(3) [The Linux Terminal](/section-3.md)
