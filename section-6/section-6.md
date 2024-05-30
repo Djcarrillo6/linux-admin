@@ -234,3 +234,31 @@ VIM Config File: ~/.vimrc
 - Each file on the disk has a data structure called `index node` or `inode` associated with it. The inode contains information such as the file name, permissions, size, etc.
 - It actually contains all file information except the file contents and the name.
 - Each `inode` is uniquely identifiable by an integer number called `inode number`(`ls -i`)
+
+
+### Challenges
+  - How to solve these challenges:
+  - To be consistent with the filenames and paths run the commands on Ubuntu
+  - Write your solution in a terminal and test it.
+  - If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+  - Save the solution in a file for future reference or recap.
+  
+  #### Challenge #1
+    - Using tar, create an archive of /etc in the current directory.
+    - Display the contents of the archive searching for a specific file in the archive.
+    - Extract the archive in the current directory.
+  
+  #### Challenge #2
+    - Using tar, create a compressed archive of /etc using gzip in the current directory.
+    - Display the contents of the archive searching for a specific file in the archive.
+    - Extract the archive in another directory.
+  
+  #### Challenge #3
+    - Create a file using a command redirection and a directory.
+    - Create 2 hard links to the file. Check the no. of hard links.
+    - Create a symlink to the initial file. Check the symlink.
+    - Delete the initial file and see what happens with the other 2 hard links and with the symlink.
+  
+  #### Challenge #4
+    - Create a symlink to the Desktop directory in another directory.
+    - Create a hard link to the Desktop directory in another directory.
