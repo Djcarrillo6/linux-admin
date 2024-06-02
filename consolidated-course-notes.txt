@@ -1,0 +1,2272 @@
+# Course Notes
+
+## section-21.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 6/1/2024
+
+## Section 21: Bash Shell Scripting
+  - The `#!` is used to define the interpreter for the script and it can point to the binary of any scripting language(not just bash).
+    - `#!/usr/bin/env bash` - Bash
+    - `#! /usr/bin/python3` - Python
+  - There are two main ways of running scripts in the terminal:
+    1. `./my-bash-script.sh` - Runs the script in a new shell process & if anything is returned it will be displayed in the terminal
+    2. `source my-bash-script.sh` - Runs the script in the current shell & if anything is returned it will be stored in the shell variable `SCRIPT_OUTPUT`
+       - `. my-bash-script.sh` - is the same as `source my-bash-script.sh`
+  
+  ### Variables In Bash
+    - Variables are used to store information in the shell
+    - `$` is used to reference a variable
+    - `$1` is used to reference the first argument passed to the script
+    - To see all functions & variables use `env` or `set`
+      - The `set` command often prints too much output, so it's reccomended to pipe it's output to less `set | less` or `set | grep VAR_NAME` to filter and see specific variables
+    - To unset a variable use `unset VAR_NAME`
+    - OS env variables that are predefined are often all capitalized such as `$PATH` or `$SHELL`
+    
+    #### Env Variables
+    - Defined for the current shell and are inherited by any child shells or processes spawned by the shell.
+    - They are used to pass information to the processes that are spawned from the current shell.
+    - To see all env variables use `env` or `printenv`.
+    
+    #### Shell Variables
+      - They are contained exclusively within the shell in which they were set or defined.
+      - Can be displayed with the `set` command or `env` command.
+    
+    #### Connfig Files:
+      - User confirgurati file: `~/.bashrc` or `/.zshrc`.
+      - System wide configuration file: `/etc/bash.bashrc` or `/etc/zsh/zshrc`
+    
+    #### The `PATH` Variable
+      - The `PATH` variable is used to specify the search path for commands.
+      - The `PATH` variable is set in the `~/.bashrc` or `~/.zshrc`
+      - To see all PATHs use `echo $PATH`
+      - To add a new PATH use `export PATH=PATH_TO_ADD:$PATH`
+      - To remove a PATH use `export PATH=PATH_TO_REMOVE:$PATH`
+      - Any shell scripts that are located in any of the directories that are listed in the `PATH` variable will be able to run by the name of the script without needing to specify the path such as `./script.sh` could become `script.sh` and executed without needing to specify the path.
+    
+    #### Postional Parameters
+      - See the [PDF](./bash-shell-scripting/resources/positional-args.pdf) for more details.
+    
+    #### If, Elif, and Else Statements
+      - To see all possible conditionals to use in an if/elif/else statement use `man test`.
+      - Using `[[]]` in conditional statements allows for single quote string variables, however it's consideered good practice to include double quotes in the string.
+        - `[[ -d "$1" ]]` -> Tests if `$1` is a directory
+    
+    #### Testing Integers
+      - In scripts conditional statements can be used to test integers with a set of operators such as `==`, `!=`, `>=`, `>`, `<=`, `<` and their string equivalents like `-eq`, `ne`, `ge`, `gt`, `le`, `lt`.
+    
+    #### Command Substitution
+      - To run a shell command and store it's output into variable for later use use `$(VAR_NAME)`.
+    
+    #### String Comparison in Conditionals
+      - See the Bash script [bash_comparing_strings.sh](./bash-shell-scripting/resources/bash_comparing_strings.sh) for more details.
+    
+    
+    #### Conditional Code Syntax:
+      # if [ some_condition_is_true ]
+      # then
+      #   //execute this code
+      # elif [ some_other_condition_is_true ]
+      # then
+      #   //execute_this_code
+      # else
+      #   //execute_this_code
+      # fi
+      ## Examples:
+      ```sh
+        i=1
+        if [[ $i -lt 10 ]]
+        then
+          echo "i is less than 10."
+        fi
+        #################
+        i=100
+        if [[ $i -lt 10 ]]
+        then
+          echo "i is less than 10."
+        else
+          echo "i is greater than or equal to 10."
+        fi
+        ################
+        i=10
+        if [[ $i -lt 10 ]]
+        then
+          echo "i is less than 10."
+        elif [[ $i -eq 10 ]]
+        then
+          echo "i is 10"
+        else
+          echo "i is greater than or equal to 10."
+        fi
+      ```
+      ### TESTING CONDITIONS => man test ###
+      ### For numbers (integers) ###
+      # -eq   equal to
+      # -ne   not equal to
+      # -lt   less than
+      # -le   less than or equal to
+      # -gt   greater than
+      # -ge   greater than or equal to
+      
+      # For files:
+      # -s    file exists and is not empty
+      # -f    file exists and is not a directory
+      # -d    directory exists
+      # -x    file is executable by the user
+      # -w    file is writable by the user
+      # -r    file is readable by the user
+      
+      # For Strings
+      # =     the equality operator for strings if using single square brackets [ ]
+      # ==    the equality operator for strings if using double square brackets [[ ]]
+      # !=    the inequality operator for strings
+      # -n $str   str is nonzero length
+      # -z $str   str is zero length
+      
+      # &&  => the logical and operator
+      # ||  => the logical or operator
+    
+    
+    #### Local Variables In Functions
+      - The `local` keyword is used to create local variables in a function.
+      - It's a good practice to use `local` keyword when declaring variables in a function.
+      - Functions have access to the global variables.
+    
+    ##### Menus in Bash. The Select Statement
+      - See the script [bash_select_menus.sh](./bash-shell-scripting/resources/bash_select_menus.sh) for more details.
+      - Commonly used in CLI applications.
+    
+    #### Bash Arrays
+      - Bash arrays are used to store multiple values in a single variable.
+      - To print the array use `echo ${array[@]}` or `echo ${array[*]}`.
+      - To print the indices of the array use `echo ${!array[@]}` or `echo ${!array[*]}`.
+      - To print the length of the array use `echo ${#array[@]}` or `echo ${#array[*]}`.
+      - You can reference by index or by name `echo ${array[0]}` or `echo ${array[name]}`.
+      - Negative indices can be used to reference from the end of the array `echo ${array[-1]}`.
+      - To remove an element from the array use `unset array[index]`.
+      - To remove all elements from the array use `unset array`.
+      - To clear the array use `array=()`.
+      - To copy an array use `array2=(${array1[@]})`.
+      - To append an element to the array use `array+=("element")`.
+      - To slice an array use `array2=(${array1[@]:index:length})`.
+      - Associative arrays are indexed with string keys and used to store key/value pairs in a single variable.
+      - To set an associative array use `declare -A array`.
+      
+      
+      ##### The `readarray` Command:
+        - The `readarray` command is used to read the contents `STDIN` or files and store them into an indexed array.
+        - `readyarray account < <(cat ./users.txt)`
+          - The `< < ( ... )` syntax is used to redirect the output of a command to the `readarray` command.
+      
+      ##### Iterating Over Arrays:
+        - Iterate over an array using a for loop:
+          - `for element in "${array[@]}"`
+        - Iterate over an array using a while loop:
+          - `while read -r element; do`
+## section-20-challenge.md
+# [EXTRA] Section 20: Buld A Linux Server From Scratch
+
+### Date 6/1/2024
+## section-1.md
+# Section 1 - Getting Started
+
+## (1) Linux Command Cheat Sheet
+- [Linux Command Cheat Sheet](https://drive.google.com/file/d/1WJyjAfRmdgFbZq-ii5HKGQepjDMFpixf/view?usp=sharing)
+## section-10-challenges.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/29/2024
+
+## Section 10: Challenges - File Permissions
+How to solve these challenges:
+  - To be consistent with the filenames and paths run the commands on Ubuntu
+  - Write your solution in a terminal and test it.
+  - If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+  - Save the solution in a file for future reference or recap.
+
+
+
+- Create a directory with a regular file in it. Work as a non-privileged user.
+
+
+#### Challenge #1
+- Display the permissions of ubuntu.txt
+- Remove all permissions of others.
+
+
+#### Challenge #2
+- Remove the read permission of ubuntu.txt for the owner and check if the owner can read the file.
+
+
+#### Challenge #3
+- Using the octal notation, set the permissions of the directory to rwxrwx--- and of the file to rw-r-----
+
+
+#### Challenge #4
+- Set the permissions of the directory to 0667. Check if the user (owner) can list its contents, move to the directory and remove it.
+
+
+#### Challenge #5
+- Set the permissions of all the files in the user's home directory to 0640 and the permissions of all directories to 0750.
+
+
+#### Challenge #6
+- As a non-privileged user list the contents of /root using the ls command. See what will happen.
+- As root set SUID to ls and list the contents of /root again as a non-privileged user.
+- Check the SUID permission set on ls
+- As root remove the SUID bit.
+
+
+#### Challenge #7
+- Set the directory permissions to 0777 and the file permissions to 0000. As another non-privileged user, try to remove the file.
+- Create a new file in the directory and set its permissions to 0644.
+- Set the Sticky Bit on the directory.
+- As another non-privileged user, try to remove the file.
+
+
+#### Challenge #8
+- Change the owner and the group owner of all files in the current user home directory to the current user and its primary group.
+## section-11.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/30/2024
+
+## Section 11 - Linux Process Managment
+
+### Processes & The Linux Security Model:
+  * See [PDF](.resources/linux-process-management.pdf) for more details.
+  
+  - Not all commands in Linux result in a dedicated process. There are two types of commands in Linux, commands that are executable files on the hard disk and commands that are shell built-ins.
+  - The `type` command can be used to determine which of the two types of commands is being used.
+    - `type rm` -> `rm is /usr/bin/rm`
+    - `type cd` -> `cd is a shell builtin`
+  - Only when running a command that is an executable file is a new process created, unlike when a shell built-in command is used in which case no new process is created.
+  - Each process has: 
+    - A process ID (PID) and *possibly* a parent process ID (PPID). The PPID is the PID of the parent process.
+    - A User
+    - A Group
+    - Priority/Nice
+  - The OS maintains a table that associates every process to the data necessary for it's execution.
+  - When a process terminates it's execution the OS releases most of the resources and information associated with it.
+    - A terminated process whose data has not been collected is called a zombie process.
+  
+  ### Whats The Difference Between A Process and A Thread?
+    - Threads are processes that run in parallel with the OS. They are created when a process is created, and are terminated when the process terminates.
+    - Multiple threads can exist in the same process and share the same resources.
+    - Can be thought of as "sub processes" that run in the same memory context(process) and share the same resources.
+    - "Task" is often a synonym for "process".
+  
+  ### Process Viewing Commands (ps, pstree, pgrep)
+    #### Checking if a command is shell built-in or executable file
+    - `type rm`        # => rm is /usr/bin/rm
+    - `type cd`        # => cd is a shell built-in
+    
+    #### Displaying all processes started in the current terminal
+      - `ps`
+    
+    #### Displaying all processes running in the system
+      - `ps -ef` 
+      - `ps aux`
+      - `ps aux | less`       # => piping to less
+    
+    #### sorting by memory and piping to less
+      - `ps aux --sort=%mem | less`
+    
+    #### ASCII art process tree
+      - `ps -ef --forest`
+    
+    #### Displaying all processes of a specific user
+      - `ps -f -u username`
+    
+    #### Checking if a process called sshd is running
+      - `pgrep -l sshd`
+      - `ps -ef | grep sshd`
+    
+    #### Displaying a hierarchical tree structure of all running processes
+      - `pstree`
+    
+    #### Prevent merging identical branches
+      - `pstree -c`
+  
+  ### Getting a Dynaic Real-Time View of the Running System (top, htop):
+    - `top` returns a dynamic real-time view of the running system:
+      - Updates every 3 seconds by default.
+      - There are two areas of the output, (1) summary & (2) task/process table
+      - `summary`:
+        - Intuitive display of system resources
+        - `top` - Displays the total time of the running system, total logged in users, avg load, etc.
+        - `Tasks` - Displays the total number of tasks/processes and their states(running, sleeping, stopped, zombie)
+        - `%Cpu(s)` - Displays the CPU usage based on the interval of last refresh
+  
+  ### Commands - top:
+    #### starting top
+      - `top`
+    
+    #### top shortcuts while it's running:
+      - `h`       # => getting help
+      - `space`   # => manual refresh
+      - `d`       # => setting the refresh delay in seconds
+      - `q`       # => quitting top
+      - `u`       # => display processes of a user
+      - `m`       # => changing the display for the memory
+      - `1`       # => individual statistics for each CPU
+      - `x/y`     # => highlighting the running process and the sorting column
+      - `b`       # => toggle between bold and text highlighting
+      - `<`       # => move the sorting column to the left
+      - `>`       # => move the sorting column to the right
+      - `F`       # => entering the Field Management screen 
+      - `W`       # => saving top settings
+    
+    #### running top in batch mode (3 refreshes, 1 second delay)
+      - `top -d 1 -n 3 -b > top_processes.txt`
+  
+  # Interactive process viewer (top alternative)
+    - `sudo apt update && sudo apt install htop`    # => Installing htop
+    - `htop`
+  
+  ### Signals and Killing Processes (kill, pkill, killall, pidof):
+    - The `kill` command is most commonly used to kill a process.
+    - It sends a signal to the process that defaults to `SIGTERM`.
+    - There are many different signals that can be sent with the `kill` command, and they can be listed with `kill -l`.
+    - A `signal` is an asynchronous signal that can be sent to a process.
+    - To target a process, you must first determine the `PID` of the process.
+      - A quick way to filters the list of running processes is to use the `pidof` command.
+        - `pidof -s chrome` #=> returns all PID(s) that match the string "chrome"
+    - To signal multuple process IDs as a group, use the `kill` command and pass the all capital letters of the signal or the number of the signal.
+      - `kill -INT 15029 14977 16489 65989` or `kill -2 15029 14977 16489 65989`
+  
+  ### Foreground & Background Processes:
+    - By default any process that is started from the terminal is run in the foreground.
+    - To run a process in the background, use the `&` operator at the end of the command.
+    - When starting a process in the background, it can be identified by a job ID.
+    - When seeing a display of all processes in the background, use the job ID is usually in the bracket and the process ID is to the right of the bracket.
+      - `sleep 20 &` -> `[1] 15766`
+  
+  ### Job Control:
+    - The `jobs` command is used to display all the jobs that are currently running.
+    - You can bring a background process to the foreground using the `fg` command.
+    - You can push any foreground process to the background using the `bg` command.
+    - A shortcut to kill a background process is the `Ctrl + Z` keys.
+  
+  ### Process Management Commands:
+    #### Killing processes (kill, pkill, killall)
+      ##### Listing all signals
+      - `kill -l`
+      
+      ##### Sending a signal (default SIGTERM - 15) to a process by pid 
+      - `kill pid`        # => Ex: - kill 12547
+      
+      ##### Sending a signal to more processes
+      - `kill -SIGNAL pid1 pid2 pid3`
+      
+      ##### Sending a specific signal (SIGHUP - 1) to a process by pid
+      - `kill -1 pid`
+      - `kill -HUP pid`
+      - `kill -SIGHUP pid`
+      
+      ##### Sending a signal (default SIGTERM - 15) to process by process name
+      - `pkill process_name`          # => Ex: pkill sleep
+      - `killall process_name`
+      - `kill $(pidof process_name)`  # => Ex: kill -HUP $(pidof sshd)
+      
+      ##### Running a process in the background
+      - `command &`   # => Ex: sleep 100 &
+      
+      ##### Showing running jobs
+      - `jobs`
+      
+      ##### Stopping (pausing) the running process
+      -` Ctrl + Z`
+      
+      ##### Resuming and bringing to the foreground a process by job_d
+      - `fg %job_id`
+      
+      ##### Resuming in the background a process by job_d
+      - `bg %job_id`
+      
+      ##### starting a process immune to SIGHUP
+      - `nohup command` &     # => Ex: nohup wget http://site.com &
+## section-12-challenges.md
+How to solve these challenges:
+
+To be consistent with the filenames and paths run the commands on Ubuntu
+
+Write your solution in a terminal and test it.
+
+If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+
+Save the solution in a file for future reference or recap.
+
+
+
+Challenge #1
+
+List all running processes.
+
+Check if a process named bash is running (use both ps and pgrep).
+
+
+
+Challenge #2
+
+Using the ps command list all processes sorted by memory in reverse order.
+
+Redirect the output to a file called processes.txt
+
+
+
+Challenge #3
+
+Start top, sort processes by CPU, and highlight the running processes and the sorting column.
+
+
+
+Challenge #4
+
+Generate a text file that contains 3 runs (refreshes) of top with a delay of 1second.
+
+
+
+Challenge #5
+
+Install htop and start it.
+
+
+
+Challenge #6
+
+Using the kill command send the default signal (SIGTERM - 15) to the current terminal.
+
+
+
+Challenge #7
+
+Start a graphical application like gedit or firefox.
+
+Find its PID and send the SIGINT (2) signal to the application.
+
+
+
+Challenge #8
+
+Start a graphical application like gedit from a terminal in the background.
+
+Kill the application using pkill.
+
+
+
+Challenge #9
+
+Run a command that takes some time to complete like ls -lR / in the foreground. After a few seconds stop (pause) the command by pressing Ctrl + Z.
+
+Print its JOBID and PID and resume the command in the foreground.
+
+
+
+Challenge #10
+
+Run sleep 100 in the background.
+
+Close the terminal, open it again and check if the process is still running.
+
+If it’s not running, run sleep 100 again making it immune to the closing terminal.
+## section-13.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/29/2024
+
+## Section 13: Linux Networking
+- There are two primary Linux commands for inspecting the network interfaces: `ip` and `ifconfig`.
+  - `ip` is used to inspect the network interfaces
+  - `ifconfig` is used to inspect the network interfaces
+  
+  ### Commands:
+    #### Getting info about the network interfaces (ifconfig, ip, route):
+      ##### displaying information about enabled interfaces
+      - `ifconfig`
+      
+      ##### displaying information about all interfaces (enabled and disabled)
+      - `ifconfig -a`
+      - `ip address show`
+      
+      ##### displaying info about a specific interface
+      - `ifconfig enp0s3`
+      - `ip addr show dev enp0s3`
+      
+      ##### showing only IPv4 info
+      - `ip -4 address`
+      
+      ##### showing only IPv6 info
+      - `ip -6 address`
+      
+      ##### displaying L2 info (including the MAC address)
+      - `ip link show`
+      - `ip link show dev enp0s3`
+      
+      ##### displaying the default gateway
+      - `route `
+      - `route -n`    # numerical addresses
+      - `ip route show`
+      
+      ##### displaying the DNS servers
+      - `resolvectl status`
+      
+      #### Setting the network interfaces (ifconfig, ip, route):
+      ##### disabling an interface
+      - `ifconfig enp0s3 down`
+      - `ip link set enp0s3 down`
+      
+      ##### activating an interface
+      - `ifconfig enp0s3 up`
+      - `ip link set enp0s3 up`
+      
+      ##### checking its status
+      - `ifconfig -a`
+      - `ip link show dev enp0s3`
+      
+      ##### setting an ip address on an interface
+      - `ifconfig enp0s3 192.168.0.222/24 up`
+      - `ip address del 192.168.0.111/24 dev enp0s3`
+      - `ip address add 192.168.0.112/24 dev enp0s3`
+      
+      ##### setting a secondary ip address on sub-interface
+      - `ifconfig enp0s3:1 10.0.0.1/24`
+      
+      ##### deleting and setting a new default gateway
+      - `route del default gw 192.168.0.1`
+      - `route add default gw 192.168.0.2`
+      
+      ##### deleting and setting a new default gateway
+      - `ip route del default`
+      - `ip route add default via 192.168.0.1` 	
+      
+      ##### changing the MAC address
+      - `ifconfig enp0s3 down`
+      - `ifconfig enp0s3 hw ether 08:00:27:51:05:a1`
+      - `ifconfig enp0s3 up`
+      
+      ##### changing the MAC address
+      - `ip link set dev enp0s3 address 08:00:27:51:05:a3`
+  
+  ### Assigning A Static IP Address On Linux:
+    - Typically most devices get their IP address assigned dynamically by the DCHP server which in most cases in the router the device is connected to. However if a server requires a static configuration to avoid a single point of failure that comes from using a DHCP server.
+    - Since the release on Ubuntu 17.10, `NetPlan` is the default network configuration tool to manage networks.
+      - `NetPlan` uses YAML files that are usually stored in `/etc/netplan`.
+    - To statically configure a network interface, you can use the `ifconfig` command.
+    
+    #### NetPlan Commands:
+      #### Network Static configuration using Netplan (Ubuntu)
+      ##### 1. Stop and disable the Network Manager
+      - `sudo systemctl stop NetworkManager`
+      - `sudo systemctl disable NetworkManager`
+      - `sudo systemctl status NetworkManager`
+      - `sudo systemctl is-enabled NetworkManager`
+      
+      ##### 2. Create a YAML file in /etc/netplan:
+      ```yaml
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          enp0s3:
+            dhcp4: false
+            addresses:
+              - 192.168.0.20/24
+            gateway4: "192.168.0.1"
+            nameservers:
+              addresses:
+                - "8.8.8.8"
+                - "8.8.4.4"
+      ```
+      
+      ##### 3. Apply the new config
+      - `sudo netplan apply`
+      
+      ##### 4. Check the configuration
+      - `ifconfig`
+      - `route -a`
+  
+  ### SSH Commands:
+    #### OpenSSH:
+      ##### 1. Installing OpenSSH (client and server)
+      ###### Ubuntu
+      - `sudo apt update && sudo apt install openssh-server openssh-client`
+      
+      ###### CentOS
+      - `sudo dnf install openssh-server openssh-clients`
+      
+      ##### connecting to the server
+      - `ssh -p 22 username@server_ip`        # => Ex: ssh -p 2267 john@192.168.0.100
+      - `ssh -p 22 -l username server_ip`
+      - `ssh -v -p 22 username@server_ip`     # => verbose
+      
+      #### 2. Controlling the SSHd daemon
+      ##### checking its status
+      - `sudo systemctl status ssh`       # => Ubuntu
+      - `sudo systemctl status sshd`      # => CentOS
+      
+      ##### stopping the daemon
+      - `sudo systemctl stop ssh`       # => Ubuntu
+      - `sudo systemctl stop sshd`      # => CentOS
+      
+      ##### restarting the daemon
+      - `sudo systemctl restart ssh`       # => Ubuntu
+      - `sudo systemctl restart sshd`      # => CentOS
+      
+      ##### enabling at boot time 
+      - `sudo systemctl enable ssh`       # => Ubuntu
+      - `sudo systemctl enable sshd`      # => CentOS
+      
+      - `sudo systemctl is-enabled ssh`       # => Ubuntu
+      - `sudo systemctl is-enabled sshd`      # => CentOS
+      
+      #### 3. Securing the SSHd daemon
+      ##### change the configuration file (/etc/ssh/sshd_config) and then restart the server
+      - `man sshd_config`
+      - Change the port
+      Port 2278
+      
+      - Disable direct root login
+      PermitRootLogin no
+      
+      - Limit Users’ SSH access
+        AllowUsers stud u1 u2 john
+      - Filter SSH access at the firewall level (iptables)
+      - Activate Public Key Authentication and Disable Password Authentication
+      - Use only SSH Protocol version 2
+      - Other configurations:
+        ClientAliveInterval 300
+        ClientAliveCountMax 0
+        MaxAuthTries 2
+        MaxStartUps 3
+        LoginGraceTime 20
+  
+  ### Copying Files Over the Network (SCP):
+    - `scp` is used to copy files over the network, and there are three cases of use:
+      - 1. Copy files from your local machine to a remote server
+      - 2. Copy files from a remote server to your local machine
+      - 3. Copy files between two remote servers
+        - In this case, your machine likely only provides the instructions to connect to the remote server.
+      - **Always be careful when copying files from one machine to another that have the same path on each machine because `scp` will overwrite any files that already exist**
+  
+  ### Synchronizing Files & Directories Using `rsync`:
+    - `rsync` is a tool that is used to synchronise files and directories between two machines.
+    - `rsync` is the ideal command for handling backups, syncs, mirroring, etc.
+    - `rsync` is installed by default on most Linux systems and MacOS.
+  
+  ### Copying Commands:
+    #### Copying files using SCP and RSYNC
+    ##### SCP
+    ###### Copying a local file to a remote destination
+      - `scp a.txt john@80.0.0.1:~`
+      - `scp -P 2288 a.txt john@80.0.0.1:~`       # using a custom port
+    
+    ###### Copying a local file from a remote destination to the current directory
+      - `scp -P 2290 john@80.0.0.1:~/a.txt .`
+    
+    ###### Copying a local directory to a remote destination (-r)
+      - `scp -P 2290 -r projects/ john@80.0.0.1:~`
+    
+    ### RSYNC
+    ###### Synchronizing a directory
+      - `sudo rsync -av /etc/ ~/etc-backup/`
+    
+    ###### Mirroring (deleting from destination the files that were deleting from source)
+      - `sudo rsync -av --delete /etc/ ~/etc-backup/`
+    
+    ###### Excluding files
+      - `rsync -av --exclude-from='~/exclude.txt' source_directory/ destination_directory/`
+    
+    ###### Exclude.txt:
+    ```txt
+      *.avi
+      music/
+      abc.mkv
+    ```
+      - `rsync -av --exclude='*.mkv' --exclude='movie1.avi' source_directory/ destination_directory/`
+    
+    ###### Synchronizing a directory over the network using SSH
+      - `sudo rsync -av -e ssh /etc/ student@192.168.0.108:~/etc-backup/` 
+    
+    ###### Using a custom port
+      - `sudo rsync -av -e 'ssh -p 2267' /etc/ student@192.168.0.108:~/etc-backup/`
+    
+    ### `wget` Commands:
+      #### WGET
+      ###### installing wget
+      - `apt install wget`        // Ubuntu
+      - `dnf install wget`        // CentOS
+      
+      ###### download a file in the current directory
+      - `wget https://cdimage.kali.org/kali-2020.2/kali-linux-2020.2-installer-amd64.iso`
+      
+      ###### resuming the download 
+      - `wget -c https://cdimage.kali.org/kali-2020.2/kali-linux-2020.2-installer-amd64.iso`
+      
+      ###### saving the file into a specific directory
+      - `mkdir kali`
+      - `wget -P kali/ https://cdimage.kali.org/kali-2020.2/kali-linux-2020.2-installer-amd64.iso`
+      
+      ###### limiting the rate (bandwidth)
+      - `wget --limit-rate=100k -P kali/ https://cdimage.kali.org/kali-2020.2/kali-linux-2020.2-installer-amd64.iso`
+      
+      ###### downloading more files 
+      - `wget -i urls.txt`      // urls.txt contains urls
+      
+      ###### starting the download in the background
+      - `wget -b -P kali/ https://cdimage.kali.org/kali-2020.2/kali-linux-2020.2-installer-amd64.iso`
+      - `tail -f wget-log`        // checking its status
+      
+      ###### getting an offline copy of a website
+      - `wget --mirror --convert-links --adjust-extension --page-requisites --no-parent http://example.org`
+      - `wget -mkEpnp http://example.org`
+      
+      
+      ##### NETSTAT and SS:
+      ###### displaying all open ports and connections
+      - `sudo netstat -tupan`
+      - `sudo ss -tupan`
+      - `netstat -tupan | grep :80`   // checking if port 80 is open
+      
+      ###### LSOF:
+      ###### listing all files that are open
+      - `lsof`
+      
+      ###### listing all files opened by the processes of a specific user
+      - `lsof -u username`
+      
+      ###### listing all files opened by a specific process
+      - `lsof -c sshd`
+      
+      ###### listing all files that have opened TCP ports
+      - `lsof -iTCP -sTCP:LISTEN`
+      - `lsof -iTCP -sTCP:LISTEN -nP`
+      
+      #### Scanning hosts and networks using nmap:
+      #### ** SCAN ONLY YOUR OWN HOSTS AND SERVERS !!! **##
+      #### **Scanning Networks is your own responsibility**
+      
+      # Syn Scan - Half Open Scanning (root only)
+      - `nmap -sS 192.168.0.1`
+      
+      # Connect Scan
+      - `nmap -sT 192.168.0.1`
+      
+      # Scanning all ports (0-65535)
+      - `nmap -p- 192.168.0.1`
+      
+      # Specifying the ports to scan
+      - `nmap -p 20,22-100,443,1000-2000 192.168.0.1`
+      
+      # Scan Version
+      - `nmap -p 22,80 -sV 192.168.0.1`
+      
+      # Ping scanning (entire Network)
+      - `nmap -sP 192.168.0.0/24`
+      
+      # Treat all hosts as online -- skip host discovery
+      - `nmap -Pn 192.168.0.0/24`
+      
+      # Excluding an IP
+      - `nmap -sS 192.168.0.0/24 --exclude 192.168.0.10`
+      
+      # Saving the scanning report to a file
+      - `nmap -oN output.txt 192.168.0.1`
+      
+      # OS Detection
+      - `nmap -O 192.168.0.1`
+      
+      # Enable OS detection, version detection, script scanning, and traceroute
+      - `nmap -A 192.168.0.1`
+      
+      # Reading the targets from a file (ip/name/network separated by a new line or a whitespace)
+      - `nmap -p 80 -iL hosts.txt` 
+      
+      # Exporting to out output file and disabling reverse DNS
+      - `nmap -n -iL hosts.txt -p 80 -oN output.txt`
+## section-14-challenges.md
+**Section 14: Challenges - Network Interfaces**
+  ## How to solve these challenges:
+  - To be consistent with the filenames and paths run the commands on Ubuntu
+  - Write your solution in a terminal and test it.
+  - If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+  - Save the solution in a file for future reference or recap.
+  - Do not solve these challenges on a remote machine to which you are connected with SSH.
+  - Run the following commands only on a local machine.
+  
+  ### Challenge #1
+    - List the IP address, the Default Gateway, the Mac Address and the DNS Servers.
+    - Use both ifconfig and ip commands.
+  
+  
+  ### Challenge #2
+    - Using ifconfig, disable the Ethernet interface.
+    - Using ip, enable the Ethernet interface.
+    - Check its status both with ifconfig and ip.
+  
+  
+  ### Challenge #3
+    - Set a new temporary IP address using both ip and ifconfig.
+  
+  
+  ### Challenge #4
+    - Using ifconfig, set a secondary IP address on the Ethernet interface.
+  
+  
+  ### Challenge #5
+    - Change the MAC address to a random one.
+  
+  ## Copying Files Challenges
+  ### Challenge #6
+    - Start 2 Linux VMs with the network in bridged mode and check that they are reachable using ping.
+  
+  
+  ### Challenge #7
+    - Install OpenSSH on one Linux VM, check the service status, and then connect to it using the ssh client from the other Linux VM.
+  
+  
+  ### Challenge #8
+    - Secure the SSH Daemon:
+    - Change the listening Port to 2266
+    - Allow only a single non-privileged user to connect to the SSH server.
+    - Disable root login entirely.
+  
+  
+  ### Challenge #9
+    - Create a directory and a file in the user’s home directory.
+    - Using scp, copy both the file and the directory to the remote Linux VM where the SSH daemon is running.
+  
+  
+  ### Challenge #10
+    - Using scp, copy a file from the remote VM where the SSH daemon is running to the local machine, in the current directory.
+  
+  
+  ### Challenge #11
+    - Solve the last 2 challenges using rsync instead of scp.
+## section-15.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/31/2024
+
+## Section 15: Linux Software Management
+
+## Software Management Commands (dpkg and apt):
+  ### DPKG:
+  ##### Getting info about a deb file
+  - dpkg --info google-chrome-stable_current_amd64.deb
+  
+  ##### Installing an application from a deb file
+  - sudo dpkg -i google-chrome-stable_current_amd64.deb
+  
+  ##### List all installed programs
+  - dpkg --get-selections
+  - dpkg-query -l
+  
+  ##### Filtering the output
+  - dpkg-query -l | grep ssh
+  
+  ##### Listing all files of an installed package
+  - dpkg-query -l | grep ssh
+  - dpkg -L openssh-server
+  
+  ##### Finding to which package a file belongs 
+  - which ls
+  - dpkg -S /bin/ls
+      coreutils: /bin/cp
+  
+  ##### Removing a package
+  - sudo dpkg -r google-chrome-stable
+  
+  ##### Purging a package
+  - sudo dpkg -P google-chrome-stable
+  
+  ### APT:
+  #### Updating the package index (doesn't install/uninstall/update any package)
+  - sudo apt update
+  
+  #### Installing or updating a package named apache2
+  - sudo apt install apache2
+  
+  #### Listing all upgradable packages
+  - sudo apt list --upgradable
+  
+  #### Upgrading all applications
+  - sudo apt full-upgrade
+  - sudo apt full-upgrade -y        # => assume yes to any prompt (useful in scripts)
+  
+  #### Removing a package
+  - sudo apt remove apache2
+  
+  #### Removing a package and its configurations
+  - sudo apt purge apache2
+  
+  #### Removing dependencies that are not needed anymore
+  - sudo apt autoremove
+  
+  #### Removing the saved deb files from the cache directory (var/cache/apt/archives)
+  - sudo apt clean
+  
+  #### Listing all available packages
+  - sudo apt list
+  - sudo apt list | wc -l
+  
+  #### Searching for a package
+  - sudo apt list | grep nginx
+  
+  #### Showing information about a package
+  - sudo apt show nginx
+  
+  #### Listing all installed packages
+  - sudo apt list --installed
+## section-16-challenges.md
+**Section 16: Challenges - Linux Software Management**
+
+## How to solve these challenges:
+- To be consistent with the filenames and paths run the commands on Ubuntu
+- Write your solution in a terminal and test it.
+- If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+- Save the solution in a file for future reference or recap.
+
+### Challenge #1
+- Download the Google Earth package (.deb) for Ubuntu from this address: https://www.google.com/intl/en_in/earth/versions/
+- Install the app using the locally downloaded .deb file and dpkg
+- Start the application.
+
+### Challenge #2
+- Remove the Google Earth application using dpkg
+- Install Google Earth again using apt and the deb file.
+
+### Challenge #3
+- Display all installed applications using dpkg
+- Take any Linux command and check to which package it belongs.
+- List all other files from that package
+
+### Challenge #4
+- Install the nginx web server using apt.
+- Start and check the service by connecting to localhost using the browser.
+- Remove the web server.
+
+### Challenge #5
+- Search for a package named squid in the official repositories and display information about it.
+
+### Challenge #6
+- List all upgradable applications.
+- Upgrade all applications assuming yes to each prompt.
+## section-17.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/31/2024
+
+## Section 17: System Administration
+
+### Task Automation & Scheduling with Cron:
+  - Cron runs as a daemon process and is used to automate repetitive tasks.
+  - The files that contains the jobs for a given user is called the `crontab` file.
+  - In Ubuntu, the `crontab` file is located in `/var/spool/cron/crontabs`.
+    - *The exact location of these files is Linux distro specific.*
+  - `crontab` is a command used to manage the cron files and depending on the context of either user or system, the file can be located at:
+    - User: `/usr/bin/crontab`
+    - System: `/etc/crontab`
+  
+  #### User Cron Jobs
+    - Each user has their own `crontab` file which contains a cron table that is used by the Linux system to manage schedule jobs.
+  
+  ### Cron Commands:
+    ## Task Scheduling using `cron`
+      ##### editing the current user’s crontab file 
+      - crontab -e
+      
+      ##### listing the current user’s crontab file 
+      - crontab -l
+      
+      ##### removing the current user’s crontab file 
+      - crontab -r
+      
+      ## COMMON EXAMPLES ##
+      ##### run every minute
+      `* * * * * /path_to_task_to_run.sh`
+      
+      ##### run every hour at minute 15
+      `15 * * * * /path_to_task_to_run.sh`
+      
+      ##### run every day at 6:30 PM
+      `30 18 * * * /path_to_task_to_run.sh`
+      
+      ##### run every Monday at 10:03 PM
+      `3 22 * * 1 /path_to_task_to_run.sh`
+      
+      ##### run on the 1st of every Month at 6:10 AM
+      `10 6 1 * * /path_to_task_to_run.sh`
+      
+      ##### run every hour at minute 1, 20 and 35
+      `1,20,35 * * * * /path_to_task_to_run.sh`
+      
+      ##### run every two hour at minute 10
+      `10 */2 * * * /path_to_task_to_run.sh`
+      
+      ##### run once a year on the 1st of January at midnight
+      `@yearly /path_to_task_to_run.sh`
+      
+      ##### run once a month at midnight on the first day of the month
+      `@monthly /path_to_task_to_run.sh`
+      
+      ##### run once a week at midnight on Sunday
+      `@weekly  /path_to_task_to_run.sh`
+      
+      ##### once an hour at the beginning of the hour
+      `@hourly /path_to_task_to_run.sh`
+      
+      ##### run at boot time
+      `@reboot /path_to_task_to_run.sh`
+      
+      All scripts in following directories will run as root at that interval:
+      - /etc/cron.hourly
+      - /etc/cron.daily  
+      - /etc/cron.hourly  
+      - /etc/cron.monthly
+      - /etc/cron.weekly
+  
+  ### Anacron Commands:
+    - Unlike `cron`, `anacron` does not expect the system to be online 24/7 but rather for windows that more align with desktop operating systems.
+    - `anacron` is not a daemon process and it is not supposed to be run as root.
+  
+  
+  ### Getting System Hardware Information:
+    - The `lwhw` command is used to get system hardware information.
+    - The `lscpu` command is used to get CPU information.
+    - The `lspci` command is used to get PCI information.
+    - The `dmidecode` command is used to get device information.
+    - The `hdparam` command is used to get disk information.
+    
+    ### Commands:
+      ##### Displaying full hardware information
+      - `lshw`
+      - `lshw -short`     // => short format
+      - l`shw -json`      // => json format
+      - `lshw -html`      // => html format
+      - `inxi -Fx`
+      
+      ##### Displaying info about the CPU
+        - `lscpu`
+        - `lshw -C cpu`
+        - `lscpu -J`  // => json format
+      
+      ##### Displaying info about the installed RAM memory
+        - `dmidecode -t memory` 
+        - `dmidecode -t memory | grep -i size`
+        - `dmidecode -t memory | grep -i max`
+      
+      ##### Displaying info about free/used memory
+        - `free -m`
+      
+      ##### Getting info about pci buses and about the devices connected to them
+        - `lspci`
+        - `lspci | grep -i wireless`
+        - `lspci | grep -i vga`
+      
+      ##### Getting info about USB controllers and about devices connected
+        - `lsusb`
+        - `lsusb -v`
+      
+      ##### Getting info about hard disks
+        - `lshw -short -C disk`
+        - `fdisk -l`
+        - `fdisk -l /dev/sda`
+        - `lsblk`
+        - `hdparm -i /dev/sda`
+        - `hdparm -I /dev/sda`
+      
+      ##### Benchmarking disk read performance
+        - `hdparm -tT --direct /dev/sda`
+      
+      ##### Getting info about WiFi cards and networks
+        - `lshw -C network`
+        - `iw list`
+        - `iwconfig`
+        - `iwlist wlo1 scan`
+      
+      ##### Getting hardware information from the /proc virtual fs
+        - `cat /proc/cpuinfo`
+        - `/proc/partitions`
+        - `cat /proc/meminfo`
+        - `cat /proc/version`
+        - `uname -r`    // => kernel version
+        - `uname -a`
+        
+        - `acpi -bi`    # battery information
+        - `acpi -V`
+      
+      #### Working directly with device files (dd)
+        ##### Backing up the MBR (the first sector of /dev/sda)
+        - `dd if=/dev/sda of=~/mbr.dat bs=512 count=1`
+        
+        ##### Restoring the MBR
+        - `dd if=~/mbr.dat of=/dev/sda bs=512 count=1`
+        
+        ##### Cloning a partition (sda1 to sdb2)
+        - `dd if=/dev/sda1 of=/dev/sdb2 bs=4M status=progress`
+  
+  
+  ### Systemd:
+    - The name comes from System Management Daemon, and it is a Linux initialization system & service manager with many components such as on demand service, logging, boot mamanagement, timer, etc.
+    - Systemd is the Ubuntu initialization system during the boot and startup process.
+    - The Linux boot process has the following phases:
+      1. The system powers up
+      2. The boot loader loads the kernel
+      3. The kernel loads the initial RAM disk
+      4. The initial RAM disk loads the system drives and looks for the root file system
+      5. Once the kernel is setup, it begin the systemd initialization process
+         1. The systemd daemon is started with PID 1, then takes over to mount the host file systems & start servicecs
+    - Unlike it's predesessor `init` system, `systemd` can run processes in parallel.
+    - When running `ps -ef | less`, `systemd` will show as `init` for backward compatibility.
+   
+   #### Service Management (systemd, systemctl):
+    - The `systemctl` command is used to manage services.
+  
+  #### Commands:
+    ## Service Management using systemd and systemctl
+      ##### Showing info about the boot process
+      - `systemd-analyze`
+      - `systemd-analyze blame`
+      
+      ##### Listing all active units systemd knows about
+      - `systemctl list-units`
+      - `systemctl list-units | grep ssh`
+      
+      ##### Checking the status of a service
+      - `sudo systemctl status nginx.service`
+      
+      ##### Stopping a service
+      - `sudo systemctl stop nginx`
+      
+      ##### Starting a service
+      - `sudo systemctl start nginx`
+      
+      ##### Restarting a service
+      - `sudo systemctl restart nginx`
+      
+      ##### Reloading the configuration of a service
+      - `sudo systemctl reload nginx`
+      - `sudo systemctl reload-or-restart nginx`
+      
+      ##### Enabling to start at boot time
+      - `sudo systemctl enable nginx`
+      
+      ##### Disabling at boot time
+      - `sudo systemctl disable nginx`
+      
+      ##### Checking if it starts automatically at boot time
+      - `sudo systemctl is-enabled nginx`
+      
+      ##### masking a service (stopping and disabling it)
+      - `sudo systemctl mask nginx`
+      
+      ##### Unmasking a service
+      - `sudo systemctl unmask nginx`
+## section-18-challenges.md
+Challenges - System Administration
+## Section 18: Challenges - System Administration
+
+
+## How to solve these challenges:
+
+- To be consistent with the filenames and paths run the commands on Ubuntu
+- Write your solution in a terminal and test it.
+- If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+- Save the solution in a file for future reference or recap.
+
+
+### Challenge #1
+- For the currently logged-in user, create a cron job that writes the current date and time to a file every 3 minutes.
+
+
+### Challenge #2
+- Create a cron job that runs as root and fully upgrades the system every Sunday at 5:10 AM
+
+
+### Challenge #3
+- Identify the partition where the root file system (/) is mounted.
+- Create a directory on the Desktop and mount that partition there as well.
+
+
+### Challenge #4
+- Consider this iso file.
+- Mount it to a directory in the user's home directory.
+
+
+### Challenge #5
+- Install the nginx web server.
+- Check that it’s running.
+- Set the server NOT to start automatically when the computer boots up.
+
+
+Note: For the following challenges, if possible, you should run the commands on a system where Linux runs as the main OS.
+
+
+### Challenge #6
+- Generate an HTML file that contains complete hardware information.
+
+
+### Challenge #7
+- Find out what is the maximum RAM memory that can be installed on the system.
+- Find out the amount of RAM memory that is already installed on the system.
+- Display the amount of RAM memory that is free and used (by the running system).
+
+
+### Challenge #8
+- Display as much information as possible about the WiFi card.
+- Note: You should run the commands on a system where Linux runs as the main OS.
+
+
+### Challenge #9
+- Display as much information as possible about the hard disks.
+
+
+### Challenge #10
+- Benchmark the read speed performance of the disks installed on your system.
+
+
+### Challenge #11
+- On a laptop, run a command that will display information about the battery status.
+## section-2.md
+# Section 2 - Setting Up Your Environment
+
+
+## Linux Distrobutions
+- A Linux Distrobution is an operating system made from a software collection based upon the Linux kernel, and often a package management system.
+
+- The Linux OS Comprises:
+    - The Linux Kernel
+    - The GNU Shell Utilities
+    - The Graphical Desktop Environment (GDE)
+## section-3.md
+# The Linux Terminal
+
+- The `Terminal Emulator` is a crucial part of any Linux system because it allows you to interact with the Linux system through a shell.
+- A `shell` is a program that takes commands from the user and gives them to the operating system's kernel to execute. It's also called the command interpreter. The shell gets started when the user logs in or when a program starts.
+- The `bash` shell is the default shell on most Linux distributions.
+
+
+### The Linux Command Structure
+- The Linux command structure is similar to that of the Windows command structure.
+- The Linux command structure is as follows:
+    - `command` `options` `arguments`
+    - `ping -c 5 google.com`
+        - `ping` is the command
+        - `-c` is the option
+        - `5` is an argument
+        - `google.com` is an argument
+
+
+### Getting Help, Man, Pages
+- The `man` command(short for manual) is used to display the manual pages for other commands which has the documentation for the command.
+- A `man` page has a specific structure and syntax that document how the program/command is designed to be used:
+
+- In the abbreviated output of `man ls` below, the bracked `[]` indicates optional arguments, and the ellipsis `...` indicates that the preceding argument can be repeated.
+
+```bash
+    man ls
+```
+
+```bash
+NAME 
+        ls - list directory contents
+
+SYNOPSIS
+        ls [OPTION]... [FILE]...
+
+DESCRIPTION
+        List information about the FILEs (the current directory by default)
+```
+
+### The `type` Command
+- The `type` command is used to find out the type of a command.
+    - A command can be a shell built-in command, a shell function, a shell script, a binary executable, or a source code file.
+
+##########################
+#### Getting Help in Linux
+##########################
+
+# MAN Pages
+`man command`     # => Ex: man ls
+
+### The man page is displayed with the less command
+#### SHORTCUTS:
+`h`         => getting help
+`q`         => quit
+`enter`     => show next line
+`space`     => show next screen
+`/string`   => search forward for a string
+`?string`   => search backwards for a string
+`n / N`     => next/previous appearance
+
+##### checking if a command is shell built-in or executable file
+`type rm`        # => rm is /usr/bin/rm
+`type cd`        # => cd is a shell builtin
+
+##### getting help for shell built-in commands
+`help command`    # => Ex: help cd
+`command --help`  # => Ex: rm --help
+
+##### searching for a command, feature or keyword in all man Pages
+`man -k uname`
+`man -k "copy files"`
+`apropos passwd`
+
+
+##########################
+#### Keyboard Shortcuts
+##########################
+TAB  # autocompletes the command or the filename if its unique
+TAB TAB (press twice)   # displays all commands or filenames that start with those letters
+
+# clearing the terminal
+`CTRL + L`
+
+# closing the shell (exit)
+`CTRL + D`
+
+# cutting (removing) the current line 
+`CTRL + U`
+
+# moving the cursor to the start of the line
+`CTRL + A`
+
+# moving the cursor to the end of the line
+`Ctrl + E`
+
+# stopping the current command
+`CTRL + C`
+
+# sleeping a the running program
+`CTRL + Z`
+
+# opening a terminal 
+`CTRL + ALT + T`
+
+
+##########################
+### Bash History
+##########################
+- The `history` command is used to display the history of commands that you have executed.
+- The `.bash_hisory` file contains the history of commands that you have executed.
+- The `HISTSIZE` variable is used to set the maximum number of commands that can be stored in the history.
+- The `HISTFILESIZE` variable is used to set the maximum number of commands that can be stored in the history file.
+- The `HISCONTROL` variable is used to set the maximum number of commands that can be stored in the history file.
+    - `ignorespace` - ignore commands that start with a space
+    - `ignoredups` - ignore commands that are duplicates of the previous command
+    - **The default on Ubuntu is `ignoreboth` which is equivalent to `ignorespace:ignoredups`. If you place a signle ` ` before a command, then it will be ignored in the history.**
+
+
+##### showing the history
+`history`
+
+##### removing a line (ex: 100) from the history
+`history -d 100`
+
+##### removing the entire history
+`history -c`
+
+##### printing the no. of commands saved in the history file (~/.bash_history)
+`echo $HISTFILESIZE`
+
+##### printing the no. of history commands saved in the memory
+`echo $HISTSIZE`
+
+##### rerunning the last command from the history
+`!!`
+
+##### running  a specific command from the history (ex: the 20th command)
+`!20`
+
+##### running the last nth (10th) command from the history
+`!-10`
+
+##### running the last command starting with abc 
+`!abc`
+
+##### printing the last command starting with abc 
+`!abc:p`
+
+##### reverse searching into the history
+`CTRL + R`
+
+##### recording the date and time of each command in the history
+`HISTTIMEFORMAT="%d/%m/%y %T"`
+
+##### making it persistent after reboot
+`echo "HISTTIMEFORMAT=\"%d/%m/%y %T\"" >> ~/.bashrc`
+##### or
+`echo 'HISTTIMEFORMAT="%d/%m/%y %T"' >> ~/.bashrc`
+
+## Root User vs Normal User
+
+##########################
+### Running commands as root (sudo, su)
+##########################
+#### running a command as root (only users that belong to sudo group [Ubuntu] or wheel [CentOS])
+`sudo command`
+
+#### becoming root temporarily in the terminal
+`sudo su`      # => enter the user's password
+
+#### setting the root password
+`sudo passwd root`
+
+#### changing a user's password
+`passwd username`
+
+##### Becoming root temporarily in the terminal
+`su`     # => enter the root password
+
+- The `root` user is the superuser. It has access to all the files and directories on the system.
+- The `normal` user is a regular user. It has access to only the files and directories that are created by the user.
+- **Generally it's reccomended to not use `root` for standard/ordinary tasks. When `root` privledges are needed, it's better to use `sudo` to run the command as `root` user.**
+- To log into the `root` account: `sudo su` which will prompt for the password.
+- In terminal syntax: `$` = root, `#` = normal user will be appended to the prefix of the command.
+
+##### The `sudo` Crendetial Cache Management:
+- When you log into the `root` account, the `sudo` credential cache is created for 5 minutes(on Ubunut). This means that you can run `sudo` commands without having to enter the password for 5 minutes.
+- To invalidate the cache credentials and force you to enter the password for every `sudo` command, run: `sudo -k`
+- To invalidate the cache credentials and force you to enter the password for every `sudo` command for 10 minutes, run: `sudo -k 10`
+
+##### Setting A New Password For The Root Account
+- To set a new password for the `root` account, run: `sudo passwd`
+
+
+## The `/` Directory
+- The `/` directory is the root directory of the system.
+- The `/root` directory is the home directory of the `root` user.
+- The `/home` directory is the home directory of the `normal` user.
+## section-5.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 3/27/2024
+
+## Section 5: The Linux File System
+
+### 5.24 - Intro to The Linux File System
+- In a Linux file system, everything is a file. If something is not a file, then it's a process.
+- `FHS` - The File System Hierarchy Standard:
+  - `/` - The root directory
+  - `bin` - The binary directory containes binaries or user executable files which are available to all users.
+  - `boot` - The boot directory contains the files required for starting the system.
+  - `dev` - The device directory contains device files.
+  - `etc` - The system configuration directory contains most, if not all system – wide configuration files.
+  - `home` - The home directory is where you will find your users home directories. Under this directory, there is another directory for each user, if that particular user has a home directory.
+  - `lib` - The library directory contains shared library files used by different applications.
+  - `media` - The media directory is used for external storage, will be automatically mounted.
+  - `mnt` - The mount directory is list "media", but is not very often used these days. Used to be the directory for CD-ROM and floppy disks.
+  - `opt` - The optional directory
+  - `proc` - The process directory is a virtual directory that contains process information about your computer hardware, such as information about your CPU, RAM memory, and other hardware.
+  - `run` - The runtime directory runs temporarily in RAM and 
+  - `sbin` - The system binary directory contains applications that only the superuser(hence the initial s) will need.
+  - `srv` - The server directory contains server-specific files and directories.
+  - `sys` - The system directory
+  - `tmp` - The temporary directory cotains temporary files usually stored by applications that are running.
+  - `usr` - The user directory contains user-specific files and directories.
+    - `/bin` - The binary directory
+    - `/include` - The include directory
+    - `/lib` - The library directory
+    - `local` - The local directory
+    - `sbin` - The system binary directory
+    - `/src` - The source code directory
+  - `var` - The variable directory usually contains variable-length files such as logs which are used by multiple applications.
+    - `/cache` - The cache directory
+    - `/lib` - The library directory
+    - `/log` - The log directory
+    - `/mail` - The mail directory
+    - `/spool` - The spool directory
+    - `/tmp` - The temporary directory
+
+- `~` is always the home directory of the current user.
+- On both `Ubuntu` & `CentOS` `/bin` & `/sbin` are simlinks to `/usr/bin` & `/usr/sbin` respectively.
+
+##########################
+## Linux Paths
+##########################
+
+`.`       # => the current working directory
+`..`      # => the parent directory
+`~`    # => the user's home directory
+
+`cd`      # => changing the current directory to user's home directory
+`cd ~`    # => changing the current directory to user's home directory
+`cd - `   # => changing the current directory to the last directory
+`cd /path_to_dir`    # => changing the current directory to path_to_dir 
+`pwd`     # => printing the current working directory
+
+## Installing tree
+`sudo apt install tree`
+
+`tree directory/`     # => Ex: tree .
+`tree -d .`           # => prints only directories
+`tree -f .`          # => prints absolute paths
+
+
+### The `ls` Command Implementation Details
+##########################
+
+#### The ls Command
+
+#### ls [OPTIONS] [FILES]
+
+##########################
+
+#### Listing the current directory
+
+#### ~ => user's home directory
+
+#### . => current directory
+
+#### .. => parent directory
+
+`ls`
+
+`ls .`
+
+
+
+#### Listing More Directories
+
+`ls ~ /var /`
+
+
+#### -l => Long Listing
+
+`ls -l ~`
+
+
+#### -a => Listing all files and directories including hidden ones
+
+`ls -la ~`
+
+
+#### -1 => Listing on a single column
+
+`ls -1 /etc`
+
+
+#### -d => Displaying information about the directory, not about its contents
+
+`ls -ld /etc`
+
+
+#### -h => Displaying the size in human readable format
+
+`ls -h /etc`
+
+
+#### -S => Displaying sorting by size
+
+`ls -Sh /var/log`
+
+
+#### Note: ls does not display the size of a directory and all its contents. Use `du` instead
+
+`du -sh ~`
+
+
+#### -X => Displaying sorting by extension
+
+`ls -lX /etc`
+
+
+#### --hide => Hiding some files
+
+`ls --hide=*.log /var/log`
+
+
+#### -R => Displaying a directory recursively
+
+`ls -lR ~`
+
+
+#### -i => Displaying the inode number
+
+`ls -li /etc`
+
+
+## Understanding File Timestamps: atime, mtime, ctime(stat, touch, date)
+- Every file on Linux has three timestamps: atime, mtime, and ctime
+- Each timestamp is an integer representing the number of seconds since the Unix Epoch (1970-01-01 00:00:00 UTC)
+- The `atime` is the time of last access
+- The `mtime` is the time of last modification
+- The `ctime` is the time of last status change
+
+
+### Running `ls -l`:
+- This command will list the file type and permissions for each file in the current directory
+  - The first character `-` represents the file type
+  - The first character `d` represents the directory type
+  - The first character `l` represents the symbolic link type
+  - The first character `c` represents the character device type
+  - The first character `b` represents the block device type
+  - The first character `s` represents the socket type
+  - The first character `p` represents the named pipe type
+
+
+
+### File Timestamps and Date Commands:
+##########################
+  #### displaying atime:
+  - `ls -lu`
+  
+  #### displaying mtime
+  - `ls -l`
+  - `ls -lt`
+  
+  #### displaying ctime
+  - `ls -lc`
+  
+  #### displaying all timestamps
+  - `stat file.txt`
+  
+  #### displaying the full timestamp
+  - `ls -l --full-time /etc/`
+  
+  #### creating an empty file if it does not exist, update the timestamps if the file exists
+  - `touch file.txt`
+  
+  #### changing only the access time to current time
+  - `touch -a file`
+  
+  #### changing only the modification time to current time
+  - `touch -m file`
+  
+  #### changing the modification time to a specific date and time
+  - `touch -m -t 201812301530.45 a.txt`
+  
+  #### changing both atime and mtime to a specific date and time
+  - `touch -d "2010-10-31 15:45:30" a.txt`
+  
+  #### changing the timestamp of a.txt to those of b.txt
+  - `touch a.txt -r b.txt`
+  
+  #### displaying the date and time
+  - `date`
+  
+  #### showing this month's calendar
+  - `cal`
+  
+  #### showing the calendar of a specific year
+  - `cal 2021`
+  
+  #### showing the calendar of a specific month and year
+  - `cal 7 2021`
+  
+  #### showing the calendar of previous, current and next month
+  - `cal -3`
+  
+  #### setting the date and time
+  - `date --set="2 OCT 2020 18:00:00"`
+  
+  #### displaying the modification time and sorting the output by name.
+  - `ls -l`
+  
+  #### displaying the output sorted by modification time, newest files first
+  - `ls -lt`
+  
+  #### displaying and sorting by atime
+  - `ls -ltu`
+  
+  #### reversing the sorting order
+  - `ls -ltu --reverse`
+## section-6.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/29/2024
+
+## Section 6: The Linux File System
+
+### Viewing files (cat, less, more, head, tail, watch):
+#### displaying the contents of a file
+- `cat filename`
+
+#### displaying more files
+- `cat filename1 filename2`
+
+#### displaying the line numbers
+- `can -n filename`
+
+#### concatenating 2 files
+- `cat filename1 filename2 > filename3`
+
+#### viewing a file using less
+- `less filename`
+
+#### less shortcuts:
+- `h`         => getting help
+- `q`         => quit
+- `enter`     => show next line
+- `space`     => show next screen
+- `/string`   => search forward for a string
+- `?string`   => search backwards for a string
+- `n / N`    => next/previous appearance
+
+#### showing the last 10 lines of a file
+  - `tail filename`
+
+#### showing the last 15 lines of a file
+- `tail -n 15 filename`
+
+#### showing the last lines of a file starting with line no. 5
+  - `tail -n +5 filename`
+
+#### showing the last 10 lines of the file in real-time
+  - `tail -f filename`
+
+#### showing the first 10 lines of a file
+  - `head filename`
+
+#### showing the first 15 lines of a file
+  - `head -n 15 filename`
+
+#### running repeatedly a command with refresh of 3 seconds
+  - `watch -n 3 ls -l`
+
+
+### Working with files and directory (touch, mkdir, cp, mv, rm, shred):
+#### creating a new file or updating the timestamps if the file already exists
+  - `touch filename`
+
+#### creating a new directory
+  - `mkdir dir1`
+
+#### creating a directory and its parents as well
+  - `mkdir -p mydir1/mydir2/mydir3`
+
+### The cp command
+#### copying file1 to file2 in the current directory
+  - `cp file1 file2`
+
+#### copying file1 to dir1 as another name (file2)
+  - `cp file1 dir1/file2`
+
+#### copying a file prompting the user if it overwrites the destination
+  - `cp -i file1 file2`
+
+#### preserving the file permissions, group and ownership when copying
+  - `cp -p file1 file2`
+
+#### being verbose
+  - `cp -v file1 file2`
+
+#### recursively copying dir1 to dir2 in the current directory
+  - `cp -r dir1 dir2/`
+
+#### copy more source files and directories to a destination directory
+  - `cp -r file1 file2 dir1 dir2 destination_directory/`
+
+
+### The mv command:
+#### renaming file1 to file2
+  - `mv file1 file2`
+
+#### moving file1 to dir1 
+  - `mv file1 dir1/`
+
+#### moving a file prompting the user if it overwrites the destination file
+  - `mv -i file1 dir1/`
+
+#### preventing a existing file from being overwritten
+  - `mv -n file1 dir1/`
+
+#### moving only if the source file is newer than the destination file or when the destination file is missing
+  - `mv -u file1 dir1/`
+
+#### moving file1 to dir1 as file2
+  - `mv file1 dir1/file2`
+
+#### moving more source files and directories to a destination directory
+  - `mv file1 file2 dir1/ dir2/ destination_directory/`
+
+
+### The rm command:
+#### removing a file
+  - `rm file1`
+
+#### being verbose when removing a file
+  - `rm -v file1`
+
+#### removing a directory
+  - `rm -r dir1/`
+
+#### removing a directory without prompting
+  - `rm -rf dir1/`
+
+#### removing a file and a directory prompting the user for confirmation
+  - `rm -ri fil1 dir1/`
+
+#### secure removal of a file (verbose with 100 rounds of overwriting)
+  - `shred -vu -n 100 file1`
+
+
+### Piping and Command Redirection
+  - Every Linux command or profram has 3 data streams connected to it:
+    1. STDIN(0) - Standard Input
+    2. STDOUT(1) - Standard Output
+    3. STDERR(2) - Standard Error
+  
+  * Possible Flows:
+    STDIN(0) -> COMMAND -> STDOUT(1)
+              **OR**
+    STDIN(0) -> COMMAND -> STDOUT(3)
+  
+  ### Piping Examples:
+    - `ls -lSh /etc/ | head`            # see the first 10 files by size
+    - `ps -ef | grep sshd`              # checking if sshd is running
+    - `ps aux --sort=-%mem | head -n 3`  # showing the first 3 process by memory consumption
+  
+  ### Command Redirection Examples:
+    #### output redirection
+      - `ps aux > running_processes.txt`
+      - `who -H > loggedin_users.txt`
+    
+    #### appending to a file
+      - `id >> loggedin_users.txt`
+    
+    #### output and error redirection
+      - `tail -n 10 /var/log/*.log > output.txt 2> errors.txt`
+    
+    #### redirecting both the output and errors to the same file
+      - `tail -n 2 /etc/passwd /etc/shadow > output_errors.txt 2>&1`
+      
+      #### piping and redirection
+      - `cat -n /var/log/auth.log | grep -ai "authentication failure" | wc -l`
+      - `cat -n /var/log/auth.log | grep -ai "authentication failure" > auth.txt`
+
+
+### Searching for text patterns (grep):
+  grep [OPTIONS] pattern file:
+  
+  Options:
+  `-n`          # => print line number
+  `-i`          # => case insensitive
+  `-v`         # inverse the match
+  `-w`          # search for whole words
+  `-a`          # search in binary files
+  `-R`          # search in directory recursively
+  `-c`          # display only the no. of matches
+  `-C n`        # display a context (n lines before and after the match)
+  
+  # printing ASCII chars from a binary file
+  - `strings binary_file`
+
+
+### VIM
+Modes of operation: Command, Insert, and Last Line Modes.
+VIM Config File: ~/.vimrc
+
+#### Entering the Insert Mode from the Command Mode
+  - `i`  => insert before the cursor
+  - `I`  => insert at the beginning of the line
+  - `a`  => insert after the cursor
+  - `A`  => insert at the end of the line
+  - `o`  => insert on the next line
+
+#### Entering the Last Line Mode from the Command Mode
+  - `:`
+#### Returning to Command Mode from Insert or Last Line Mode 
+  - `ESC`
+#### Shortcuts in Last Line Mode
+  - `w!`  => write/save the file
+  - `q!`  => quit the file without saving
+  - `wq!` => save/write and quit
+  - `e!`  => undo to the last saved version of the file
+  - `set nu` => set line numbers
+  - `set nonu`  => unset line numbers
+  - `syntax on|off`
+  - `%s/search_string/replace_string/g`
+
+#### Shortcuts in Command Mode
+  - `x`   => remove char under the cursor
+  - `dd`  => cut the current line
+  - `5dd` => cut 5 lines
+  - `ZZ`  => save and quit
+  - `u`   => undo
+  - `G`   => move to the end of file
+  - `$`   => move to the end of line
+  - `0` or `^`  => move to the beginning of file
+  - `:n` (Ex :10) => move to line n
+  - `Shift+v`     => select the current line
+  - `y`           => yank/copy to clipboard
+  - `p`           => paste after the cursor
+  - `P`           => paste before the cursor
+  - `/string`     => search for string forward
+  - `?string `    => search for string backward
+  - `n`           => next occurrence
+  - `N`           => previous occurrence
+  
+  # Opening more files in stacked windows
+    - `vim -o file1 file2`
+  
+  # Opening more files and highlighting the differences
+    - `vim -d file1 file2`
+    - `Ctrl+w` => move between files
+
+
+### The Inode Structure:
+- Each file on the disk has a data structure called `index node` or `inode` associated with it. The inode contains information such as the file name, permissions, size, etc.
+- It actually contains all file information except the file contents and the name.
+- Each `inode` is uniquely identifiable by an integer number called `inode number`(`ls -i`)
+
+
+### Challenges
+  - How to solve these challenges:
+  - To be consistent with the filenames and paths run the commands on Ubuntu
+  - Write your solution in a terminal and test it.
+  - If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+  - Save the solution in a file for future reference or recap.
+  
+  #### Challenge #1
+    - Using tar, create an archive of /etc in the current directory.
+    - Display the contents of the archive searching for a specific file in the archive.
+    - Extract the archive in the current directory.
+  
+  #### Challenge #2
+    - Using tar, create a compressed archive of /etc using gzip in the current directory.
+    - Display the contents of the archive searching for a specific file in the archive.
+    - Extract the archive in another directory.
+  
+  #### Challenge #3
+    - Create a file using a command redirection and a directory.
+    - Create 2 hard links to the file. Check the no. of hard links.
+    - Create a symlink to the initial file. Check the symlink.
+    - Delete the initial file and see what happens with the other 2 hard links and with the symlink.
+  
+  #### Challenge #4
+    - Create a symlink to the Desktop directory in another directory.
+    - Create a hard link to the Desktop directory in another directory.
+## section-7.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/29/2024
+
+## Section 7 - User Account Management
+- There are two types of groups that a user can belong to:
+  1. `Primary Group`: the id is stored in `etc/passwd` and the group name in `/etc/group`. This group is assigned to the files that are created by the user.
+     - A user can only belong to one primary group. 
+  2. `Secondary Group`: stored in `etc/group`.
+- In Linux, a file is owned by both the user and the group that user belongs to.
+- In the following line from `/etc/passwd: student:x:1001:1002::/home/student:/bin/bash`:
+  - 1001 is the UID(user ID) and 1002 is the primary GID(group ID).
+  - The primary group is `student` and the secondary group is `users`.
+  - The `x` is the permission bits.
+
+### Account Management
+#### IMPORTANT FILES
+##### `/etc/passwd` # => users and info: username:x:uid:gid:comment:home_directory:login_shell
+##### `/etc/shadow` # => users' passwords
+##### `/etc/group` # => groups
+
+#### Creating a user account
+useradd [OPTIONS] username
+#### OPTIONS:
+##### `-m` => create home directory
+##### `-d` directory => specify another home directory
+##### `-c` "comment"
+##### `-s` shell
+##### `-G` => specify the secondary groups (must exist)
+##### `-g` => specify the primary group (must exist)
+##### `-G` => Adds user to secondary groups
+
+Example:
+  - `useradd -m -d /home/john -c "C++ Developer" -s /bin/bash -G sudo,adm,mail john`
+
+##### changing a user account
+`usermod [OPTIONS]` username # => uses the same options as useradd
+
+Example:
+  - `usermod -aG developers,managers john # => adding the user to two secondary groups`
+
+##### deleting a user account
+  - `userdel -r username` # => `-r` removes user's home directory as well
+
+##### creating a group
+  - `groupadd group_name`
+
+##### deleting a group
+  - `groupdel group_name`
+
+##### displaying all groups
+  - `cat /etc/groups`
+
+##### displaying the groups a user belongs to
+  - `groups`
+
+#### creating admin users
+##### add the user to sudo group in Ubuntu and wheel group in CentOS
+  - `usermod -aG sudo john`
+
+
+#### Monitoring Users
+  - `who -H` # => displays logged in users
+  - `id` # => displays the current user and its groups
+  - `whoami` # => displays EUID
+
+##### listing who’s logged in and what’s their current process.
+  - `w`
+  - `uptime`
+
+##### printing information about the logins and logouts of the users
+  - `last`
+  - `last -u username`
+## section-8-challenges.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/29/2024
+
+## Section 8 - User Account Management Exercises
+
+### Challenges - User Account Management
+
+
+### How to solve these challenges:
+  - To be consistent with the filenames and paths run the commands on Ubuntu
+  - Write your solution in a terminal and test it.
+  - If your solution is not correct, then try to understand the error messages, watch the video again, rewrite the solution, and test it again. Repeat this step until you get the correct solution.
+  - Save the solution in a file for future reference or recap.
+  
+  #### Challenge #1
+    - Create a new user using the useradd command with no other options. Check if the home directory of the user was created as well.
+    - Set a password for the user.
+    - Log in as the new user (in a terminal or GUI).
+  
+  #### Challenge #2
+    - Create a new user using the useradd specifying the following: the home directory (which will be created as well), the Bash shell, and a comment.
+    - Set a password for the user.
+    - Create a new group using the groupadd command and then add the user to the newly created group.
+    - Check the groups to which the user belongs.
+  
+  #### Challenge #3
+    - Try to execute a command as root (like say sudo cat /etc/shadow or sudo ls -l /root). Run the command as the user you created at the previous challenge. Notice what will happen.
+    - Make this user an admin one and rerun the command as root.
+  
+  #### Challenge #4
+    - Create 2 new groups and add the user from the previous challenge to those groups without taking it out of the groups it already belongs to.
+  
+  #### Challenge #5
+    - Remove the groups and the users (including their home directory) created in the previous challenges.
+  
+  #### Challenge #6
+    - Understand the concept of salt used in Linux passwords. Create 2 new users and set the same password for both of them. Check that the save password in /etc/shadow is different for each user.
+## section-9.md
+# Linux Administration: The Complete Linux Bootcamp For 2024
+### Date: 5/29/2024
+
+## Section 9 - Linux File Permissions
+
+
+### File Permissions:
+  - File permissions (file modes) specifcy who can access, change or execute a file on a Linux system.
+  - It ensures that only authorized users and processes can access files and directories.
+  - Each file or directory has an owner and a group. By default, the owner is the user who creates the file and the group is the primary group of the user who creates the file.
+  - The ownership of a file or a directory can be changed only by root using the `chown` and `chgrp` commands.
+  - For each file the permissions are assigned to three different categories of users:
+    1. The file owner
+    2. The group owner
+    3. Other (anyone else or the outside world)
+  
+  - `ls -l /etc/passwd` -> `-rw-r--r-- 1 root 2972 May 29 18:14 /etc/passwd`:
+    - The first character `-` defines the file type
+    - The 9 characters that follow the first are the file permissions & a hyphen implies an absence of a file permission.
+      - The first trio of this 9 define the owner permissions
+      - The second trio of this 9 define the group permissions
+      - The third trio of this 9 define the everyone else's permissions
+  
+  ### Octal (Numeric) Notation Of File Permissions:
+    - Linux file permissions are representated in either a symbolic link or an octal notation.
+    - See `./resources/octal-notation.pdf` for more details
+  
+  ### Changing File Permissions (chmod):
+    - `chmod` is the command used to change the permissions of a file or a directory using either the symbolic link or octal notation.
+    - Only the root, or the file's owner, can change the file's permissions.
+  
+  ### Changing File Ownership (chown, chgrp):
+  See `./resources/chown-and-chgrp.pdf` for more details
+  
+  
+  #### Special Permissions - SUID (Set User ID):
+    - Besides, `r`, `w`, and `x` for the owner, group and others respectively, there are 3 extra special permissions for each file or directory: `SUID` or `Set User ID`, `SGID` or `Set Group ID`, and `Sticky` or `Sticky Bit`.
+    - These special permissions are for a file or directory overall, not just for a user category.
+    - **When an executeable file with SUID is executed then the resulting process will have the permissions of the owner of the command, not the permissions of the user who executed the command.**
+    
+    * Setting SUID:
+     - Absolute Mode: `chmod 4XXX file`
+     - Relative Mode: `chmod u+s file`
+      
+      [RUN]: `ls -l /usr/bin/passwd` -> `-rwsr-xr-x 1 root root 4775 May 29 18:14 /usr/bin/passwd`
+  
+  * For Details On SUID: [here](./resources/SUID.pdf)
+  * For Details on SGID: `./resources/SGID.pdf`
+  * For Detrails on Stick Bit: `./resources/sticky-bit.pdf`
+  
+  #### The `usmak` Command:
+    - On Linux all files and directories are created with a default set of permissions. The `umask` utility allows you to view or set the base or the default permissions for a newly created file or directory.
+      - The default permission for files is `0666` which means `readable, writable, and executable`
+      - The default for directories is `0777` which means `readable, writable, and executable`, and `sticky bit`
+  
+  #### Understanding File Attributes:
+    - The attributes define the properties of a file or a directory.
+    - Linux allows for ACL(s) (Access Control Lists) to be associated with files.
+    - Each file attribute can have one of two states: `set` or `cleared`.
+    - The attributes are considered distinct from other metadata such as file system permissions, owner, group, and size.
+    
+    * The `lsattr` Command:
+      - The `lsattr` command displays the attributes of a file or directory. 
+      - Each attribute will have either a `-` or a `[CHARACTER]` depending on whether the attribute is set or cleared:
+        - `e`: This means extend format and it indicates that the file is using extends for mapping the blocks on disk.
+        - To see the rest of the options, use the `man lsattr` command.
+    
+    * The `chattr` Command:
+      - The `chattr` command is used to change the attributes of a file or a directory.
+      - To see the rest of the options, use the `man chattr` command.
+  
+  
+  ### File Permissions Commands:
+    #### LEGEND
+    `u` = User
+    `g` = Group
+    `o` = Others/World
+    `a` = all
+    
+    `r` = Read
+    `w` = write
+    `x` = execute
+    `-` = no access
+    
+    ##### Displaying the permissions (ls and stat)
+      - `ls -l /etc/passwd`
+        
+        Example Output of `ls -l /etc/passwd`:
+          -rw-r--r-- 1 root root 2871 aug 22 14:43 /etc/passwd
+      
+      - `stat /etc/shadow`
+        Example Outputof `stat /etc/shadow`:
+              File: /etc/shadow
+              Size: 1721      	Blocks: 8          IO Block: 4096   regular file
+              Device: 805h/2053d	Inode: 524451      Links: 1
+              Access: (0640/-rw-r-----)  Uid: (    0/    root)   Gid: (   42/  shadow)
+              Access: 2020-08-24 11:31:49.506277118 +0300
+              Modify: 2020-08-22 14:43:36.326651384 +0300
+              Change: 2020-08-22 14:43:36.342652202 +0300
+              Birth: -
+    
+    ##### Changing the permissions using the relative (symbolic) mode:
+      - `chmod u+r filename`
+      - `chmod u+r,g-wx,o-rwx filename`
+      - `chmod ug+rwx,o-wx filename`
+      - `chmod ugo+x filename`
+      - `chmod a+r,a-wx filename`
+    
+    ##### Changing the permissions using the absolute (octal) mode:
+      PERMISSIONS      EXAMPLE
+      u   g   o
+      rwx rwx rwx     chmod 777 filename
+      rwx rwx r-x     chmod 775 filename
+      rwx r-x r-x     chmod 755 filename
+      rwx r-x ---     chmod 750 filename
+      rw- rw- r--     chmod 664 filename
+      rw- r-- r--     chmod 644 filename
+      rw- r-- ---     chmod 640 filename
+    
+    ##### setting the permissions as of a reference file
+      - `chmod --reference=file1 file2`
+    
+    ##### Changing permissions recursively
+      - `chmod -R u+rw,o-rwx filename`
+    
+    #### SUID (Set User ID):
+      ##### Displaying the SUID permission:
+      - `ls -l /usr/bin/umount` 
+      
+      Example Output of `ls -l /usr/bin/umount`:
+        -rwsr-xr-x 1 root root 39144 apr  2 18:29 /usr/bin/umount
+      
+      - `stat /usr/bin/umount`
+      
+      Example Output of `stat /usr/bin/umount`:
+          File: /usr/bin/umount
+          Size: 39144     	Blocks: 80         IO Block: 4096   regular file
+          Device: 805h/2053d	Inode: 918756      Links: 1
+          Access: (4755/-rwsr-xr-x)  Uid: (    0/    root)   Gid: (    0/    root)
+          Access: 2020-08-22 14:35:46.763999798 +0300
+          Modify: 2020-04-02 18:29:40.000000000 +0300
+          Change: 2020-06-30 18:27:32.851134521 +0300
+          Birth: -
+      
+      # Setting SUID
+        - `chmod u+s executable_file`
+        - `chmod 4XXX executable_file`      # => Ex: chmod 4755 script.sh
+      
+      
+      #### SGID (Set Group ID):
+        ##### Displaying the SGID permission
+        - `ls -ld projects/`
+        
+        Example Output of `ls -ld projects/`:
+        drwxr-s--- 2 student student 4096 aug 25 11:02 projects/
+        
+        - `stat projects/`
+        
+        Example Output of `stat projects/`:
+            File: projects/
+            Size: 4096      	Blocks: 8          IO Block: 4096   directory
+            Device: 805h/2053d	Inode: 266193      Links: 2
+            Access: (2750/drwxr-s---)  Uid: ( 1001/ student)   Gid: ( 1002/ student)
+            Access: 2020-08-25 11:02:15.013355559 +0300
+            Modify: 2020-08-25 11:02:15.013355559 +0300
+            Change: 2020-08-25 11:02:19.157290764 +0300
+            Birth: -
+        
+        ##### setting SGID
+          - `chmod 2750 projects/`
+          - `chmod g+s projects/`
+    
+    
+    ## The Sticky Bit
+      - The stick bit is used to allow a file to be executed with only the owner's permission.
+      ##### Displaying the sticky bit permission
+      - `ls -ld /tmp/`
+      
+      Example Output of `ls -ld /tmp/`:
+        drwxrwxrwt 20 root root 4096 aug 25 10:49 /tmp/
+      
+      - `stat /tmp/`
+      
+      Example Output of `stat /tmp/`:
+        File: /tmp/
+        Size: 4096      	Blocks: 8          IO Block: 4096   directory
+        Device: 805h/2053d	Inode: 786434      Links: 20
+        Access: (1777/drwxrwxrwt)  Uid: (    0/    root)   Gid: (    0/    root)
+        Access: 2020-08-22 14:46:03.259455125 +0300
+        Modify: 2020-08-25 10:49:53.756211470 +0300
+        Change: 2020-08-25 10:49:53.756211470 +0300
+        Birth: -
+      
+      ##### Setting the sticky bit
+      - `mkdir temp`
+      - `chmod 1777 temp/`
+      - `chmod o+t temp/`
+      - `ls -ld temp/`
+      
+      Example Output of `ls -ld temp/`:
+        drwxrwxrwt 2 student student 4096 aug 25 11:04 temp/
+    
+    
+    #### UMASK:
+      ##### Displaying the UMASK
+      - `umask` 
+      
+      ##### Setting a new umask value
+      - umask new_value     # => Ex: umask 0022
+      
+      #### Changing File Ownership (root only):
+        ##### Changing the owner
+        - `chown new_owner file/directory`      # => Ex: sudo chown john a.txt
+        
+        ##### Changing the group owner
+        - `chgrp new_group file/directory`
+        
+        ##### Changing both the owner and the group owner
+        - `chown new_owner:new_group file/directory`
+        
+        ##### Changing recursively the owner or the group owner
+        - `chown -R new-owner file/directory`
+        
+        ##### displaying the file attributes
+        - `lsattr filename`
+        
+        ##### Changing the file attributes
+        - `chattr +-attribute filename`     # => Ex: sudo chattr +i report.txt
